@@ -1,0 +1,36 @@
+version: '3'
+services:
+    mongodb:
+        image: mongo:3.4
+        ports:
+            - "27017:27017"
+        volumes:
+            - "/opt/vtr/data/mongodb/data:/data/db"
+            - "/opt/vtr/data/mongodb/log:/var/log/mongodb"
+    ansible_api:
+        build: ./ansible_api
+        image: ansible_api:0.5.5 
+        working_dir: "/opt/ansible"
+            command: "/usr/bin/gin"
+        environment:
+            - DB_host=XXX
+            - HTTP_PORT=27017
+            - DB_PASSWORD=XXX
+        ports:
+            - "9191:9191"
+            - "8000:8000"
+        volumes:
+            - "/opt/vtr/data/gin/log:/var/log/gin/"
+        depends_on:
+            - mongodb
+            - mysql
+    mysql:
+        image: mysql:5.6
+        restart: always
+        environment:
+            - MYSQL_DATABASE=XXX
+            - MYSQL_ROOT_PASSWORD=XXX
+        ports:
+            - "3306:3306"
+        volumes:
+            - "/opt/vtr/data/mysql/data:/var/lib/mysql"
